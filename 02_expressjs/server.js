@@ -13,10 +13,9 @@ const cars = [
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-  res.json(cars);
+app.get("/", (req, res) => {
+  res.send("hello from api");
 });
-
 router.get("/:id", (req, res) => {
   const id = Number(req.params.id);
   const car = cars.find((car) => car.id === id);
@@ -24,6 +23,10 @@ router.get("/:id", (req, res) => {
   if (!car) return res.status(404).send("car not found");
 
   res.json(car);
+});
+
+router.get("/", (req, res) => {
+  res.json(cars);
 });
 
 router.post("/", (req, res) => {
@@ -63,10 +66,11 @@ router.delete("/:id", (req, res) => {
   const id = Number(req.params.id);
   const index = cars.findIndex((c) => c.id === id);
 
-  if (index === -1) {
+if (index === -1) {
     return res.status(404).json({ error: "car not found" });
   }
-  const deleted = cars.splice(index, 1)[0];
+  const deleted = cars.splice(index , 1)[0]
+
 });
 
 app.use("/api/v1/cars", router);
