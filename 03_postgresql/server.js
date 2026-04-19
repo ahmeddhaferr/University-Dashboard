@@ -90,15 +90,26 @@ router.delete("/cars/:id", async (req, res) => {
   }
 });
 
-router.get("/cars/:id", (req, res) => {
+router.get("/cars/:id", async (req, res) => {
   const carId = parseInt(req.params.id);
-  const car = cars.find((c) => c.id === carId);
 
-  if (!car) {
-    return res.status(404).json({ error: "Car not found" });
+  try {
+    const result = await db
+      .select()
+      .from(cars)
+      .where(eq(cars.id, carId));
+
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Car not found" });
+    }
+
+    res.json(result[0]); // نرجع عنصر واحد فقط
+  } catch (err) {
+    res.status(500).json({
+      error: "Something went wrong!",
+      message: err.message,
+    });
   }
-
-  res.json(car);
 });
 
 app.use("/api/v1", router);
