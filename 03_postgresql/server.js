@@ -47,22 +47,37 @@ router.post("/cars", async (req, res) => {
   res.status(201).json(newCar);
 });
 
-router.put("/cars/:id", (req, res) => {
-  const carId = parseInt(req.params.id);
-  const carIndex = cars.findIndex((c) => c.id === carId);
-
-  if (carIndex === -1) {
-    return res.status(404).json({ error: "Car not found" });
-  }
-
+router.put("/cars/:id", async (req, res) => {
+  const carId = Number(req.params.id);
   const { make, model, year, price } = req.body;
 
-  if (make) cars[carIndex].make = make;
-  if (model) cars[carIndex].model = model;
-  if (year) cars[carIndex].year = parseInt(year);
-  if (price) cars[carIndex].price = parseFloat(price);
+  try {
+    const updatedCar = await db
+      .update(cars)
+      .set({
+        make,
+        model,
+        year,
+        price,
+      })
+      .where(eq(cars.id, carId))
+      .returning(); 
 
-  res.json(cars[carIndex]);
+    if (updatedCar.length === 0) {
+      return res.status(404).json({ error: "Car not found" });
+    }
+
+    res.json({
+      message: "Car updated successfully",
+      car: updatedCar[0],
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      error: "Something went wrong!",
+      message: err.message,
+    });
+  }
 });
 
 router.delete("/cars/:id", async (req, res) => {
