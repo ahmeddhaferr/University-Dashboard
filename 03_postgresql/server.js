@@ -94,16 +94,16 @@ router.get("/cars/:id", async (req, res) => {
   const carId = parseInt(req.params.id);
 
   try {
-    const result = await db
+    const car = await db
       .select()
       .from(cars)
       .where(eq(cars.id, carId));
 
-    if (result.length === 0) {
+    if (car.length === 0) {
       return res.status(404).json({ error: "Car not found" });
     }
 
-    res.json(result[0]); // نرجع عنصر واحد فقط
+    res.json(car[0]);
   } catch (err) {
     res.status(500).json({
       error: "Something went wrong!",
